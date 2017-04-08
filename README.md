@@ -21,7 +21,7 @@ Editor: Takeshi Okamoto
 
 このライブラリはqoosky氏がMITライセンスで公開している
 
-Arduino_HttpClient_ESP8266_AT 
+Arduino_HttpClient_ESP8266_AT   
 Copyright (c) 2016 Qoosky  
 https://github.com/qoosky/Arduino_HttpClient_ESP8266_AT  
   
