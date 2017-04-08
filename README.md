@@ -7,8 +7,10 @@ ArduinoでESP-WROOM-02(無線LAN)を使用して「URL(GET/POST)によるデー�
 など  
   
 ## 使い方  
-現在、作成中です。4/8中にはリンクを張ると思います。
-  
+
+データを送受信をするIoTデバイスの作り方   
+http://www.petitmonte.com/robot/esp_wroom_02.html  
+    
 ## 注意事項  
 ・スケッチ例(examples)では日本語(UTF8)を使用していますので、Arduino IDE 1.8.2以降をお使いください。  
 
