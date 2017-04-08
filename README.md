@@ -8,7 +8,7 @@ ArduinoでESP-WROOM-02(無線LAN)を使用して「URL(GET/POST)によるデー�
   
 ## 使い方  
 
-データを送受信をするIoTデバイスの作り方(TESP8266の使い方)   
+データを送受信をするIoTデバイスの作り方(TESP8266の使い方)  
 http://www.petitmonte.com/robot/esp_wroom_02.html  
     
 ## 注意事項  
