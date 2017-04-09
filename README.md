@@ -31,7 +31,7 @@ https://github.com/qoosky/Arduino_HttpClient_ESP8266_AT
 ・get(),post()メソッドでファイルの受信にも対応。  
 ・DHCPの有効/無効に対応。(固定IPアドレスを指定可能になる)  
 ・(シリアルモニター)ESP-WROOM-02との接続時にバージョン情報を表示。  
-・(シリアルモニター)Wifi接続時にIPアドレス、ゲートウェイ、ネットマスクを表示。    
+・(シリアルモニター)AP接続時にIPアドレス、ゲートウェイ、ネットマスクを表示。    
 ・SoftwareSerialの廃止。HardwareSerialのみ有効。(文字化けの解消)  
 ・スケッチ例の変更、加筆、追加。  
 など  
