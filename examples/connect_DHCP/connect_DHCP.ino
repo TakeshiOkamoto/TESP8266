@@ -4,8 +4,8 @@
 #include <TESP8266.h>
 
 // Wifi
-String SSID = "xxx";
-String PASSWORD = "xxx";
+const char* SSID = "xxx";
+const char* PASSWORD = "xxx";
 
 // グローバル変数
 TESP8266 httpClient(Serial);   
