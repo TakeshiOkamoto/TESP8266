@@ -106,7 +106,8 @@ bool TESP8266::connectedTcp() {
       return false;
   }
   
-  // 元のコード(接続のID[0～4]があるのでマルチ接続用)  
+  // 元のコード
+  // ※接続のID[0～4]があるのでマルチ接続用?  
   //  uint8_t retry = 5;
   //  do {
   //      if(ipStatus() == 3) return true;
@@ -272,7 +273,8 @@ bool TESP8266::statusWiFi() {
       return false;
   }
     
-  // 元のコード(接続のID[0～4]があるのでマルチ接続用)
+  // 元のコード
+  // ※接続のID[0～4]があるのでマルチ接続用?  
   //  uint8_t checkCnt = 5;
   //  do {
   //      if(ipStatus() == 5) return false;
