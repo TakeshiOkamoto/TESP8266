@@ -4,14 +4,14 @@
 #include <TESP8266.h>
 
 // Wifi
-String SSID = "xxx";
-String PASSWORD = "xxx";
+const char* SSID = "xxx";
+const char* PASSWORD = "xxx";
 
 // URL  http://www.example.com/iot/post.php
 // POST value=123&string=abcde
-String HOST = "www.example.com";
-String PATH = "/iot/post.php";
-String BODY = "value=123&string=abcde"; 
+const char* HOST = "www.example.com";
+const char* PATH = "/iot/post.php";
+const char* BODY = "value=123&string=abcde"; 
 
 // グローバル変数
 TESP8266 httpClient(Serial);   
