@@ -19,13 +19,22 @@
 #define __TESP8266_H__
 
 #include <Arduino.h>
+#include <SoftwareSerial.h>
 
 class TESP8266{           
   
  private:
+    // SoftwareSerial rx and tx pins
+    uint32_t m_rxPin;
+    uint32_t m_txPin;
+     
     // AT command serial interface for ESP8266
     Stream *m_serial; 
-              
+
+    // true  : HardwareSerial
+    // false : SoftwareSerial
+    bool HardSerialFlg = false;
+                     
     // Clear rx buffer
     void rxClear();
 
@@ -54,7 +63,14 @@ class TESP8266{
                      const String& contentType = "", const String& body = "");   
 
  public:
+    // - SoftwareSerial 
+    //   rxPin: Wire this to Tx Pin of ESP8266
+    //   txPin: Wire this to Rx Pin of ESP8266
+    TESP8266(uint32_t rxPin, uint32_t txPin);
+    // - HardwareSerial 
     TESP8266(HardwareSerial &serial);
+    
+    // Destructor
     ~TESP8266();
 
     // Health check of the serial interface
