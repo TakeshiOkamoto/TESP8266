@@ -9,8 +9,8 @@ const char* password = "xxx";
 
 // URL http://www.example.com/iot/get.php?value=1&string=ABCDE
 // GET value=1&string=ABCDE
-const char* HOST = "www.example.com";
-const char* PATH = "/iot/get.php?value=1&string=ABCDE";
+const char* host = "www.example.com";
+const char* path = "/iot/get.php?value=1&string=ABCDE";
 
 // シリアルの種類 (HardwareSerial or SoftwareSerial)
 // HardwareSerialとSoftwareSerialを切り替える際には
@@ -50,7 +50,7 @@ void setup() {
 
     // HTTP GETリクエストの実行
     uint32_t filesize = 0; // (戻り値)ファイルサイズ 
-    String raw  = httpClient.get(HOST, PATH, filesize);
+    String raw  = httpClient.get(host, path, filesize);
     
     if(raw == "OK") {
         Serial.println("*** GETの成功");
