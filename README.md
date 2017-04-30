@@ -3,8 +3,9 @@ ArduinoでESP-WROOM-02(無線LAN)を使用して「URL(GET/POST)によるデー�
 
 ## 機能
 ・Wifi接続  
-・HTTP GET/POST (データの送受信)  
-など  
+・HTTP GET/POST (データの送受信)   
+・HardwareSerial/SoftwareSerial対応    
+など  
   
 ## 使い方  
 
@@ -30,8 +31,8 @@ https://github.com/qoosky/Arduino_HttpClient_ESP8266_AT
 [変更点]  
 ・get(),post()メソッドでファイルの受信にも対応。  
 ・DHCPの有効/無効に対応。(固定IPアドレスを指定可能になる)  
+・SoftwareSerialによる「文字化け」の解消。   
 ・(シリアルモニター)ESP-WROOM-02との接続時にバージョン情報を表示。  
 ・(シリアルモニター)AP接続時にIPアドレス、ゲートウェイ、ネットマスクを表示。  
-・SoftwareSerialの廃止。HardwareSerialのみ有効。(文字化けの解消)  
 ・スケッチ例の変更、加筆、追加。  
 など  
