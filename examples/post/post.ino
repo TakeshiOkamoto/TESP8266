@@ -23,6 +23,7 @@ const char* body = "value=123&string=abcde";
   
   // SoftwareSerial (RX受信ピン番号,TX送信ピン番号)
   //TESP8266 httpClient(2,3); 
+
 void setup() {      
     // シリアルの通信速度(115.2kbps)
     Serial.begin(115200);
