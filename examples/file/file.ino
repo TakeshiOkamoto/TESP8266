@@ -4,18 +4,26 @@
 #include <TESP8266.h>
 
 // Wifi
-const char* SSID = "xxx";
-const char* PASSWORD = "xxx";
+const char* ssid = "xxx";
+const char* password = "xxx";
 
 // URL http://www.example.com/iot/file.txt
-const char* HOST = "www.example.com";
-const char* PATH = "/iot/file.txt";
+const char* host = "www.example.com";
+const char* path = "/iot/file.txt";
 
-// グローバル変数
-TESP8266 httpClient(Serial);   
+// シリアルの種類 (HardwareSerial or SoftwareSerial)
+// HardwareSerialとSoftwareSerialを切り替える際には
+// ESP-WROOM-02をリセットする必要があります。
+// ※リセットはUSB電源(給電)を10秒ぐらいはずせばOKです。
+
+  // HardwareSerial
+  TESP8266 httpClient(Serial);  
+  
+  // SoftwareSerial (RX受信ピン番号,TX送信ピン番号)
+  //TESP8266 httpClient(2,3); 
 
 void setup() {      
-    // HardwareSerialの通信速度(115.2kbps)
+    // シリアルの通信速度(115.2kbps)
     Serial.begin(115200);
 
     // ESP-WROOM-02との接続確認(ATコマンドのテスト)
@@ -27,7 +35,7 @@ void setup() {
 
     // アクセスポイントに接続(DHCP)
     while(true) { 
-        if(httpClient.connectAP(SSID, PASSWORD)) { Serial.println("*** アクセスポイントに接続しました。"); break; }
+        if(httpClient.connectAP(ssid, password)) { Serial.println("*** アクセスポイントに接続しました。"); break; }
         else Serial.println("*** アクセスポイントに接続できませんでした。 再試行中...");
         delay(1000);
     }
@@ -41,7 +49,7 @@ void setup() {
 
     // HTTP GETリクエストの実行
     uint32_t filesize = 0; // (戻り値)ファイルサイズ 
-    String raw  = httpClient.get(HOST, PATH, filesize);
+    String raw  = httpClient.get(host, path, filesize);
 
     Serial.println("---"); 
         
