@@ -52,7 +52,7 @@ bool TESP8266::restart() {
     const unsigned long start = millis();
     while(millis() - start < 3000) {
         if(statusAT()) {
-            delay(1500);
+            delay(1500);  
             return true;
         }
         delay(100);
@@ -181,12 +181,12 @@ String TESP8266::sendRequest(const String& method,
     }
 
     // Start to buffer serial data fast!! to avoid serial buffer overflow.    
-    const unsigned long start = millis();
- 
-    String raw = "";    
+    unsigned long start = millis(); 
+     
     bool file_get_flg = false;
     bool contenttype_flg = false;
     filesize = 0;
+    
     while (millis() - start < 2000) {
         String line="";
 
@@ -194,9 +194,21 @@ String TESP8266::sendRequest(const String& method,
             
             // ファイルの取得
             if(file_get_flg){
-                raw = m_serial->readStringUntil("*CLOSED");                
-                raw.replace("CLOSED\r\n","");                
-                return raw; 
+                char c; String raw = "";  
+                start = millis(); 
+                
+                // 前バージョンではm_serial->readStringUntil("*CLOSED")でファイルを取得していましたが、
+                // シリアルの種類によってCLOSEDの扱いが異なるバグ？がありますので、時間指定で取得しています。(IDE1.8.2)
+              
+                // 1秒間だけシリアルバッファを読み込む
+                while (millis() - start < 1000) { 
+                    while (m_serial->available() > 0) {
+                        c = m_serial->read();
+                        raw += c;
+                    }
+                }
+                raw.replace("CLOSED\r\n","");  
+                return raw;
             }else{
                 // シリアルバッファから一行を読み込む
                 line = m_serial->readStringUntil('\r\n');
@@ -220,9 +232,6 @@ String TESP8266::sendRequest(const String& method,
             if(line.indexOf("CONTENT-TYPE:") != -1){             
                 contenttype_flg = true;
             }
-            
-            // デバッグ用 
-            // Serial.print(String(line.length()) + " - " + line);   
         }
     }
     return "FILE READ ERROR";
@@ -231,12 +240,32 @@ String TESP8266::sendRequest(const String& method,
 // ----------------------------------------------------------------------------
 //  Public
 // ----------------------------------------------------------------------------
+TESP8266::TESP8266(uint32_t rxPin, uint32_t txPin) :
+    m_rxPin(rxPin), m_txPin(txPin),HardSerialFlg(false)
+{
+    SoftwareSerial *serial = new SoftwareSerial(rxPin, txPin);
+    
+    // 工場出荷時のデフォルトは115200bpsです。
+    // ATコマンド(AT+UART_DEF)でbaudrateを変更している方は115200bpsに戻してください。
+    serial->begin(115200);        
+    
+    // 一時的に9600bpsに変更 (Flashには保存しません)
+    serial->println(F("AT+UART_CUR=9600,8,1,0,0"));
+    serial->begin(9600);
+    m_serial = serial;
+    rxClear();
+}
+
 TESP8266::TESP8266(HardwareSerial &serial) :
-    m_serial(&serial){
+    m_rxPin(0), m_txPin(0), m_serial(&serial),HardSerialFlg(true)
+{
 }
 
 TESP8266::~TESP8266() {
     disconnectAP();
+    if(!HardSerialFlg){
+        delete m_serial;
+    }
 }
 
 bool TESP8266::statusAT(bool version) {
@@ -253,12 +282,16 @@ bool TESP8266::statusAT(bool version) {
       checkATResponse(&buf); 
       
       // ゴミの削除 
-      buf.replace("AT+GMR","");  
-      buf.replace("\r\r\n","");        
-      buf.replace("\r\nOK","");              
-      buf.setCharAt(0,'*');
-      buf.replace("*",""); 
-      m_serial->println(buf);
+      if(HardSerialFlg){
+        buf.replace("AT+GMR","");  
+        buf.replace("\r\r\n","");        
+        buf.replace("\r\nOK","");              
+        buf.setCharAt(0,'*');
+        buf.replace("*",""); 
+        m_serial->println(buf);
+      }else{
+        Serial.println(buf);
+      }
     }
         
     return result; 
@@ -286,8 +319,10 @@ bool TESP8266::statusWiFi() {
 
 bool TESP8266::connectAP(const String& ssid, const String& password, String ip,String gateway,String netmask) {
     rxClear();
-    m_serial->println(F("AT+CWMODE_DEF=1")); // 1: station(client/子機) mode, 2: softAP(server/親機) mode, 3: 1+2
-    if(!(checkATResponse() && restart())) return false; // change "DEF"ault cwMode and restart
+    m_serial->println(F("AT+CWMODE_CUR=1")); // 1: station(client/子機) mode, 2: softAP(server/親機) mode, 3: 1+2
+    
+    if(!(checkATResponse())) return false; 
+    //if(!(checkATResponse() && restart())) return false; // change "DEF"ault cwMode and restart
     
     // 電源投入時の自動接続の有効/無効
     // 0:無効 1:有効(デフォルト)
@@ -312,13 +347,13 @@ bool TESP8266::connectAP(const String& ssid, const String& password, String ip,S
       m_serial->println("AT+CIPSTA_CUR=\"" + ip +"\",\""+ gateway +"\",\"" + netmask + "\""); 
       if(!checkATResponse()) return false;
     }
-    
+  
     uint8_t retry = 5;
     do {
         // Connect to an AP
         rxClear();
         delay(500);
-        m_serial->print(F("AT+CWJAP_DEF=\""));
+        m_serial->print(F("AT+CWJAP_CUR=\""));
         m_serial->print(ssid);
         m_serial->print(F("\",\""));
         m_serial->print(password);
@@ -332,15 +367,20 @@ bool TESP8266::connectAP(const String& ssid, const String& password, String ip,S
             checkATResponse(&buf);   
             
             // ゴミの削除 
-            buf.replace("AT+CIPSTA_CUR?\r\r\n","");  
-            buf.replace("\0","");  
-            buf.replace("\r\n\r\nOK","");              
-            buf.setCharAt(0,'*');
-            buf.setCharAt(1,'*');
-            buf.replace("*","");  
-            
-            // ip,gateway,netmask 
-            m_serial->println(buf);       
+            if(HardSerialFlg){
+              buf.replace("AT+CIPSTA_CUR?\r\r\n","");  
+              buf.replace("\0","");  
+              buf.replace("\r\n\r\nOK","");              
+              buf.setCharAt(0,'*');
+              buf.setCharAt(1,'*');
+              buf.replace("*","");  
+     
+              // ip,gateway,netmask 
+              m_serial->println(buf);                
+            }else{
+              Serial.println(buf); 
+            }
+     
             return true;
         }
         
@@ -361,7 +401,7 @@ void TESP8266::lastResort(){
     
     // 適当なSSID、パスワード、IPアドレスなどで接続を試みます。
     // これによりWifi接続が切断されます。アドレスが被ったら適宜、変更してください。
-    m_serial->print(F("AT+CWJAP_DEF=\""));
+    m_serial->print(F("AT+CWJAP_CUR=\""));
     m_serial->print("ssid");
     m_serial->print(F("\",\""));
     m_serial->print("password");
